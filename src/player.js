@@ -1,3 +1,4 @@
+import settings from "./settings";
 export default class Player {
   constructor({ x, y, height, width }) {
     this.x = x;
@@ -5,82 +6,104 @@ export default class Player {
 
     this.height = height;
     this.width = width;
-
     this.angle = 0;
+    this.speed = 3;
+    this.color = "blue";
   }
 
   update(g) {
-    if (g.keyboard.find(key => key === "r")) {
-      this.x = this.x + 1;
+    this.updateX(g.keyboard);
+    this.updateY(g.keyboard);
+    this.updateAngle(g.keyboard);
+  }
+
+  updateX(direction) {
+    const maxWidth = settings.canvasWidth;
+    if (direction.find(key => key === "r")) {
+      this.x = this.x + this.speed;
+    } else if (direction.find(key => key === "l")) {
+      this.x = this.x - this.speed;
     }
 
-    if (g.keyboard.find(key => key === "l")) {
-      this.x = this.x - 1;
+    if (this.x >= maxWidth - this.width / 2) {
+      this.x = maxWidth - this.width / 2;
+    }
+    if (this.x <= this.width / 2) {
+      this.x = this.width / 2;
+    }
+  }
+
+  updateY(direction) {
+    const maxHeight = settings.canvasHeight;
+    if (direction.find(key => key === "u")) {
+      this.y = this.y - this.speed;
+    }
+    if (direction.find(key => key === "d")) {
+      this.y = this.y + this.speed;
     }
 
-    if (g.keyboard.find(key => key === "u")) {
-      this.y = this.y - 1;
+    if (this.y >= maxHeight - this.height / 2) {
+      this.y = maxHeight - this.height / 2;
     }
-
-    if (g.keyboard.find(key => key === "d")) {
-      this.y = this.y + 1;
+    if (this.y <= this.height / 2) {
+      this.y = this.height / 2;
     }
-
+  }
+  updateAngle(direction) {
     if (
-      !g.keyboard.includes("r") && !g.keyboard.includes("l") &&
-      g.keyboard.includes("u") && !g.keyboard.includes("d")
+      !direction.includes("r") && !direction.includes("l") &&
+      direction.includes("u") && !direction.includes("d")
     ) {
       this.angle = 0;
     }
     if (
-      g.keyboard.includes("r") && !g.keyboard.includes("l") &&
-      g.keyboard.includes("u") && !g.keyboard.includes("d")
+      direction.includes("r") && !direction.includes("l") &&
+      direction.includes("u") && !direction.includes("d")
     ) {
       this.angle = 45;
     }
     if (
-      g.keyboard.includes("r") && !g.keyboard.includes("l") &&
-      !g.keyboard.includes("u") && !g.keyboard.includes("d")
+      direction.includes("r") && !direction.includes("l") &&
+      !direction.includes("u") && !direction.includes("d")
     ) {
       this.angle = 90;
     }
     if (
-      g.keyboard.includes("r") && !g.keyboard.includes("l") &&
-      !g.keyboard.includes("u") && g.keyboard.includes("d")
+      direction.includes("r") && !direction.includes("l") &&
+      !direction.includes("u") && direction.includes("d")
     ) {
       this.angle = 135;
     }
     if (
-      !g.keyboard.includes("r") && !g.keyboard.includes("l") &&
-      !g.keyboard.includes("u") && g.keyboard.includes("d")
+      !direction.includes("r") && !direction.includes("l") &&
+      !direction.includes("u") && direction.includes("d")
     ) {
       this.angle = 180;
     }
     if (
-      !g.keyboard.includes("r") && g.keyboard.includes("l") &&
-      !g.keyboard.includes("u") && g.keyboard.includes("d")
+      !direction.includes("r") && direction.includes("l") &&
+      !direction.includes("u") && direction.includes("d")
     ) {
       this.angle = 225;
     }
     if (
-      !g.keyboard.includes("r") && g.keyboard.includes("l") &&
-      !g.keyboard.includes("u") && !g.keyboard.includes("d")
+      !direction.includes("r") && direction.includes("l") &&
+      !direction.includes("u") && !direction.includes("d")
     ) {
       this.angle = 270;
     }
     if (
-      !g.keyboard.includes("r") && g.keyboard.includes("l") &&
-      g.keyboard.includes("u") && !g.keyboard.includes("d")
+      !direction.includes("r") && direction.includes("l") &&
+      direction.includes("u") && !direction.includes("d")
     ) {
       this.angle = 315;
     }
   }
 
   draw(g) {
-    // 開始位置
     let startPoint = this.x;
     let endPoint = this.y;
-    let size = this.width;
+    let size = this.width / 2;
 
     let s1 = startPoint - size * Math.cos((90 + this.angle) / 180 * Math.PI);
     let e1 = endPoint - size * Math.sin((90 + this.angle) / 180 * Math.PI);
@@ -94,7 +117,7 @@ export default class Player {
     g.ctx.lineTo(s2, e2);
     g.ctx.lineTo(s3, e3);
     g.ctx.closePath();
-    g.ctx.fillStyle = 'blue';
+    g.ctx.fillStyle = this.color;
     g.ctx.fill();
   }
 }

@@ -1,17 +1,8 @@
 import Enemy from "./enemy";
 import Player from "./player";
+import Stage from "./stage";
 
-export const settings = {
-  appElementID: "#app",
-  canvasWidth: 1000,
-  canvasHeight: 1000,
-  gamemode: {
-    "title": { val: 0, text: true },
-    "playing": { val: 1, text: false },
-    "gameclear": { val: 2, text: true },
-    "gameover": { val: 3, text: true },
-  }
-}
+import settings from "./settings";
 
 export default class game {
   constructor() {
@@ -21,9 +12,10 @@ export default class game {
     this.canvasEl = undefined;
     this.ctx = undefined;
     this.displayCtx = undefined;
+    this.stage = new Stage();
     this.models = [
-      new Enemy({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: 32, width: 32 }),
-      new Player({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: 32, width: 32 })
+      new Enemy({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: settings.pixel, width: settings.pixel }),
+      new Player({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: settings.pixel, width: settings.pixel })
     ];
 
     const appEl = document.querySelector(settings.appElementID);
@@ -104,8 +96,10 @@ export default class game {
   _draw() {
     this.ctx.save();
 
-    this.ctx.fillStyle = 'gray';
+    this.ctx.fillStyle = '#205030';
     this.ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
+
+    this.stage.draw(this);
 
     for (const m of this.models) {
       m.update(this);
