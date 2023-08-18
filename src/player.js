@@ -7,46 +7,64 @@ export default class Player {
     this.height = height;
     this.width = width;
     this.angle = 0;
-    this.speed = 3;
     this.color = "blue";
+
+    this.characterDesign = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+      [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+      [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
+      [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+    this.color = { 0: "white", 1: "black" }
+
   }
 
   update(g) {
-    this.updateX(g.keyboard);
-    this.updateY(g.keyboard);
+    this.updateX(g.keyboard, g.stage.maxX, g.stage.minX);
+    this.updateY(g.keyboard, g.stage.maxY, g.stage.minY);
     this.updateAngle(g.keyboard);
   }
 
-  updateX(direction) {
-    const maxWidth = settings.canvasWidth;
+  updateX(direction, max, min) {
     if (direction.find(key => key === "r")) {
-      this.x = this.x + this.speed;
+      this.x = this.x + 1;
     } else if (direction.find(key => key === "l")) {
-      this.x = this.x - this.speed;
+      this.x = this.x - 1;
     }
 
-    if (this.x >= maxWidth - this.width / 2) {
-      this.x = maxWidth - this.width / 2;
+    if (this.x >= max) {
+      this.x = max;
     }
-    if (this.x <= this.width / 2) {
-      this.x = this.width / 2;
+    if (this.x <= min) {
+      this.x = min;
     }
   }
 
-  updateY(direction) {
-    const maxHeight = settings.canvasHeight;
+  updateY(direction, max, min) {
     if (direction.find(key => key === "u")) {
-      this.y = this.y - this.speed;
+      this.y = this.y - 1;
     }
     if (direction.find(key => key === "d")) {
-      this.y = this.y + this.speed;
+      this.y = this.y + 1;
     }
 
-    if (this.y >= maxHeight - this.height / 2) {
-      this.y = maxHeight - this.height / 2;
+    if (this.y >= max) {
+      this.y = max;
     }
-    if (this.y <= this.height / 2) {
-      this.y = this.height / 2;
+    if (this.y <= min) {
+      this.y = min;
     }
   }
   updateAngle(direction) {
@@ -101,23 +119,38 @@ export default class Player {
   }
 
   draw(g) {
-    let startPoint = this.x;
-    let endPoint = this.y;
-    let size = this.width / 2;
+    this.drawCharacter(g.ctx)
+  }
 
-    let s1 = startPoint - size * Math.cos((90 + this.angle) / 180 * Math.PI);
-    let e1 = endPoint - size * Math.sin((90 + this.angle) / 180 * Math.PI);
-    let s2 = startPoint - size * Math.cos((210 + this.angle) / 180 * Math.PI);
-    let e2 = endPoint - size * Math.sin((210 + this.angle) / 180 * Math.PI);
-    let s3 = startPoint - size * Math.cos((330 + this.angle) / 180 * Math.PI);
-    let e3 = endPoint - size * Math.sin((330 + this.angle) / 180 * Math.PI);
+  drawCharacter(ctx) {
+    let design = this.characterDesign.slice();
+    const rotate = a => a[0].map((_, c) => a.map(r => r[c])).reverse();
+    if (this.angle > 45 && this.angle <= 135) {
+      design = rotate(rotate(rotate(design)));
+    } else if (this.angle > 135 && this.angle <= 225) {
+      design = rotate(rotate(design));
+    } else if (this.angle > 225 && this.angle <= 270) {
+      design = rotate(design);
+    }
 
-    g.ctx.beginPath();
-    g.ctx.moveTo(s1, e1);
-    g.ctx.lineTo(s2, e2);
-    g.ctx.lineTo(s3, e3);
-    g.ctx.closePath();
-    g.ctx.fillStyle = this.color;
-    g.ctx.fill();
+    const startX = this.x * settings.pixel;
+    const startY = this.y * settings.pixel;
+
+    let y = 0;
+    let x = 0;
+    for (const row of design) {
+      x = 0;
+      for (const colorIdx of row) {
+        ctx.fillStyle = this.color[colorIdx];
+        ctx.fillRect(
+          startX + x,
+          startY + y,
+          1,
+          1
+        );
+        x++;
+      }
+      y++;
+    }
   }
 }

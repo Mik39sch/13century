@@ -4,7 +4,7 @@ import Player from "./player";
 export default class Enemy extends Player {
   constructor({ x, y, height, width }) {
     super({ x, y, height, width });
-    this.color = "orange";
+    this.color = { 0: "gray", 1: "white" }
     this.speed = 1;
     this.step = 0;
     this.prevD = []
@@ -22,8 +22,8 @@ export default class Enemy extends Player {
       this.step = randomInt({ max: 100, min: 10 });
       this.prevD = direction;
     }
-    super.updateX(direction);
-    super.updateY(direction);
+    super.updateX(direction, g.stage.maxX, g.stage.minX);
+    super.updateY(direction, g.stage.maxY, g.stage.minY);
     super.updateAngle(direction);
   }
 }

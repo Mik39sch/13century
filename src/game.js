@@ -3,6 +3,7 @@ import Player from "./player";
 import Stage from "./stage";
 
 import settings from "./settings";
+import { randomInt } from "./util";
 
 export default class game {
   constructor() {
@@ -13,9 +14,19 @@ export default class game {
     this.ctx = undefined;
     this.displayCtx = undefined;
     this.stage = new Stage();
+
+    const enemySpawnRoom = this.stage.realms[randomInt({ max: this.stage.realms.length - 1, min: 0 })];
+    const enemySpawnX = randomInt({ max: enemySpawnRoom.roomRight, min: enemySpawnRoom.roomLeft });
+    const enemySpawnY = randomInt({ max: enemySpawnRoom.roomBottom, min: enemySpawnRoom.roomTop });
+
+    const playerSpawnRoom = this.stage.realms[randomInt({ max: this.stage.realms.length - 1, min: 0 })];
+    const playerSpawnX = randomInt({ max: playerSpawnRoom.roomRight, min: playerSpawnRoom.roomLeft });
+    const playerSpawnY = randomInt({ max: playerSpawnRoom.roomBottom, min: playerSpawnRoom.roomTop });
+
+
     this.models = [
-      new Enemy({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: settings.pixel, width: settings.pixel }),
-      new Player({ x: settings.canvasWidth / 2, y: settings.canvasHeight / 2, height: settings.pixel, width: settings.pixel })
+      new Enemy({ x: enemySpawnX, y: enemySpawnY, height: settings.pixel, width: settings.pixel }),
+      new Player({ x: playerSpawnX, y: playerSpawnY, height: settings.pixel, width: settings.pixel })
     ];
 
     const appEl = document.querySelector(settings.appElementID);
@@ -77,7 +88,6 @@ export default class game {
   }
 
   _createCanvasEl(appEl) {
-
     const [w, h] = [settings.canvasWidth, settings.canvasHeight];
     let appElWidth = w;
     [appEl.style.width, appEl.style.height] = [`${appElWidth}px`, `${h}px`];
