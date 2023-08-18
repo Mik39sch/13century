@@ -32,12 +32,16 @@ export default class Player {
   }
 
   update(g) {
-    this.updateX(g.keyboard, g.stage.maxX, g.stage.minX);
-    this.updateY(g.keyboard, g.stage.maxY, g.stage.minY);
+    this.updateX(g.keyboard, g.stage.maxX, g.stage.minX, g);
+    this.updateY(g.keyboard, g.stage.maxY, g.stage.minY, g);
     this.updateAngle(g.keyboard);
+
+    g.stage.isInnerRoom(this.x, this.y, true);
+    g.stage.isInnerPath(this.x, this.y, g.keyboard, true);
   }
 
-  updateX(direction, max, min) {
+  updateX(direction, max, min, g) {
+    const prevX = this.x;
     if (direction.find(key => key === "r")) {
       this.x = this.x + 1;
     } else if (direction.find(key => key === "l")) {
@@ -50,9 +54,14 @@ export default class Player {
     if (this.x <= min) {
       this.x = min;
     }
+
+    if (g.stage.hitWall(this.x, this.y)) {
+      this.x = prevX;
+    }
   }
 
-  updateY(direction, max, min) {
+  updateY(direction, max, min, g) {
+    const prevY = this.y;
     if (direction.find(key => key === "u")) {
       this.y = this.y - 1;
     }
@@ -65,6 +74,10 @@ export default class Player {
     }
     if (this.y <= min) {
       this.y = min;
+    }
+
+    if (g.stage.hitWall(this.x, this.y)) {
+      this.y = prevY;
     }
   }
   updateAngle(direction) {

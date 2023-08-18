@@ -11,10 +11,10 @@ export default class Enemy extends Player {
   }
 
   update(g) {
-    const darr = [
+    let darr = [
       ["u"], ["u", "r"], ["r"], ["r", "d"], ["d"], ["d", "l"], ["l"], ["l", "u"], []
-    ]
-    let direction = darr[randomInt({ max: 8, min: 0 })]
+    ];
+    let direction = darr[randomInt({ max: darr.length - 1, min: 0 })]
     if (this.step > 0) {
       this.step -= 1;
       direction = this.prevD;
@@ -22,8 +22,8 @@ export default class Enemy extends Player {
       this.step = randomInt({ max: 100, min: 10 });
       this.prevD = direction;
     }
-    super.updateX(direction, g.stage.maxX, g.stage.minX);
-    super.updateY(direction, g.stage.maxY, g.stage.minY);
+    super.updateX(direction, g.stage.maxX, g.stage.minX, g);
+    super.updateY(direction, g.stage.maxY, g.stage.minY, g);
     super.updateAngle(direction);
   }
 }

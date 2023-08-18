@@ -33,16 +33,23 @@ export default class game {
 
     this._createCanvasEl(appEl);
     this.setKeyEvent();
+
+    this.stage.isInnerRoom(playerSpawnX, playerSpawnY, true);
+    this.stage.isInnerPath(playerSpawnX, playerSpawnY, ["u"], true);
   }
 
   setKeyEvent() {
     this.addKeydownEventListener(document, "keydown");
-    this.addKeyupEventListener(document, "keyup");
+    // this.addKeyupEventListener(document, "keyup");
   }
 
   addKeydownEventListener(el, event, listenerArgs = undefined) {
     const keydown = e => {
-      this.keyboard = [...new Set([...this.keyboard, this._adjustKeyCode(e.code)])];
+      this.keyboard = [this._adjustKeyCode(e.code)];
+      for (const m of this.models) {
+        m.update(this);
+      }
+      this._draw()
     }
 
     if (listenerArgs) {
@@ -54,7 +61,11 @@ export default class game {
 
   addKeyupEventListener(el, event, listenerArgs = undefined) {
     const keyup = e => {
-      this.keyboard = this.keyboard.filter(a => a !== this._adjustKeyCode(e.code));
+      this.keyboard = [this._adjustKeyCode(e.code)];
+      for (const m of this.models) {
+        m.update(this);
+      }
+      this._draw()
     }
 
     if (listenerArgs) {
@@ -112,16 +123,15 @@ export default class game {
     this.stage.draw(this);
 
     for (const m of this.models) {
-      m.update(this);
       m.draw(this);
     }
 
     this.ctx.restore();
     this.displayCtx.drawImage(this.canvasEl, 0, 0);
 
-    const currentGameMode = Object.values(settings.gamemode).find(mode => mode.val === this.gamemode);
-    if (!currentGameMode.text) {
-      this.timer = requestAnimationFrame(this._draw.bind(this));
-    }
+    // const currentGameMode = Object.values(settings.gamemode).find(mode => mode.val === this.gamemode);
+    // if (!currentGameMode.text) {
+    //   this.timer = requestAnimationFrame(this._draw.bind(this));
+    // }
   }
 }

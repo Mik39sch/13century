@@ -6,10 +6,12 @@ export default class Stage {
     this.divideX = randomInt({ max: 4, min: 2 });
     this.divideY = randomInt({ max: 4, min: 2 });
 
-    this.stageColor = 'rgba(0, 0, 150, 1)';
+    this.stageColor1 = 'rgba(0, 0, 150, 1)';
+    this.stageColor2 = 'rgba(0, 0, 150, 0.5)';
 
     this.realms = [];
     this.connects = [];
+    this.pathPositions = [];
 
     this.divide();
     this.makeRoom();
@@ -19,8 +21,6 @@ export default class Stage {
     this.minX = Math.min(...this.realms.map(r => r.left));
     this.maxY = Math.max(...this.realms.map(r => r.bottom)) - 1;
     this.minY = Math.min(...this.realms.map(r => r.top));
-
-    console.log(this.connects)
   }
 
   divide() {
@@ -102,6 +102,7 @@ export default class Stage {
       r.roomSizeY = height;
       r.roomRight = left + width - 1;
       r.roomBottom = top + height - 1;
+      r.visible = false;
       return r;
     }
 
@@ -314,8 +315,8 @@ export default class Stage {
 
   drawRoom(ctx, r) {
     ctx.lineWidth = 2;
-    ctx.strokeStyle = this.stageColor;
-    ctx.fillStyle = this.stageColor;
+    ctx.strokeStyle = r.visible ? this.stageColor1 : this.stageColor2;
+    ctx.fillStyle = r.visible ? this.stageColor1 : this.stageColor2;
     ctx.strokeRect(
       r.roomLeft * settings.pixel,
       r.roomTop * settings.pixel,
@@ -387,12 +388,56 @@ export default class Stage {
   }
 
   drawPath(ctx, x, y) {
-    ctx.fillStyle = this.stageColor;
+    let path = this.pathPositions.find(path => path.x === x && path.y === y);
+    if (!path) {
+      path = { x, y, visible: false };
+      this.pathPositions.push(path);
+    }
+
+    ctx.fillStyle = path.visible ? this.stageColor1 : this.stageColor2;
     ctx.fillRect(
       settings.pixel * x,
       settings.pixel * y,
       settings.pixel,
       settings.pixel
     );
+  }
+
+  hitWall(x, y, direction = ["u"]) {
+    if (this.isInnerRoom(x, y)) {
+      return false;
+    }
+
+    if (this.isInnerPath(x, y, direction)) {
+      return false;
+    }
+    return true;
+  }
+
+  isInnerRoom(x, y, shouldUpdateVisible = false) {
+    for (const r of this.realms) {
+      if (
+        r.roomLeft <= x && x <= r.roomRight &&
+        r.roomTop <= y && y <= r.roomBottom
+      ) {
+        if (shouldUpdateVisible) {
+          r.visible = true;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isInnerPath(x, y, direction, shouldUpdateVisible = false) {
+    for (const path of this.pathPositions) {
+      if (path.x === x && path.y === y) {
+        if (shouldUpdateVisible) {
+          path.visible = true;
+        }
+        return true;
+      }
+    }
+    return false;
   }
 }
