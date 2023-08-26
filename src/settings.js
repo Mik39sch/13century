@@ -9,5 +9,6 @@ export default {
     "gameover": { val: 3, text: true },
   },
   debugMode: true,
-  pixel: 16
+  pixel: 16,
+  visibleRange: 3,
 }

@@ -26,4 +26,12 @@ export default class Enemy extends Player {
     super.updateY(direction, g.stage.maxY, g.stage.minY, g);
     super.updateAngle(direction);
   }
+
+  draw(g) {
+    const r = g.stage.isInnerRoom(this.x, this.y);
+    const p = g.stage.isInnerPath(this.x, this.y, []);
+    if (r && r.visible || p && p.visible) {
+      super.draw(g);
+    }
+  }
 }

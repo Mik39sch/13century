@@ -103,6 +103,7 @@ export default class Stage {
       r.roomRight = left + width - 1;
       r.roomBottom = top + height - 1;
       r.visible = false;
+      r.know = false;
       return r;
     }
 
@@ -153,6 +154,17 @@ export default class Stage {
       ar = this.getAdjacentRealmIndices(i);
       r = Math.floor(Math.random() * ar.length);
       this.addConnect(this.realms[i], this.realms[ar[r]]);
+    }
+    for (const c of this.connects) {
+      this.drawConnect(null, c, false);
+    }
+  }
+
+  makePathObject(x, y) {
+    let path = this.pathPositions.find(path => path.x === x && path.y === y);
+    if (!path) {
+      path = { x, y, visible: false, know: false };
+      this.pathPositions.push(path);
     }
   }
 
@@ -248,10 +260,15 @@ export default class Stage {
     return false;
   }
 
-
   update(g) {
-    console.log("it does not need");
+    for (const r of this.realms) {
+      r.visible = false;
+    }
+    for (const path of this.pathPositions) {
+      path.visible = false;
+    }
   }
+
   draw(g) {
     this.drawScaleLine(g.ctx);
 
@@ -323,15 +340,18 @@ export default class Stage {
       r.roomSizeX * settings.pixel,
       r.roomSizeY * settings.pixel
     );
-    ctx.fillRect(
-      r.roomLeft * settings.pixel,
-      r.roomTop * settings.pixel,
-      r.roomSizeX * settings.pixel,
-      r.roomSizeY * settings.pixel
-    );
+
+    if (r.visible || r.know) {
+      ctx.fillRect(
+        r.roomLeft * settings.pixel,
+        r.roomTop * settings.pixel,
+        r.roomSizeX * settings.pixel,
+        r.roomSizeY * settings.pixel
+      );
+    }
   }
 
-  drawConnect(ctx, c) {
+  drawConnect(ctx, c, isDraw = true) {
     var i,
       dir,
       posX,
@@ -344,7 +364,12 @@ export default class Stage {
     lim = c.middle;
 
     for (i = 0; i < lim; i += 1) {
-      this.drawPath(ctx, posX, posY);
+      if (isDraw) {
+        this.drawPath(ctx, posX, posY);
+      } else {
+        this.makePathObject(posX, posY);
+      }
+
       if (dir === 0) { posY -= 1; }
       if (dir === 1) { posX += 1; }
       if (dir === 2) { posY += 1; }
@@ -362,7 +387,11 @@ export default class Stage {
     }
 
     for (i = 0; i < lim; i += 1) {
-      this.drawPath(ctx, posX, posY);
+      if (isDraw) {
+        this.drawPath(ctx, posX, posY);
+      } else {
+        this.makePathObject(posX, posY);
+      }
       if (i !== lim - 1) {
         if (dir === 0) { posY -= 1; }
         if (dir === 1) { posX += 1; }
@@ -383,24 +412,25 @@ export default class Stage {
       if (dir === 1) { posX += 1; }
       if (dir === 2) { posY += 1; }
       if (dir === 3) { posX -= 1; }
-      this.drawPath(ctx, posX, posY);
+      if (isDraw) {
+        this.drawPath(ctx, posX, posY);
+      } else {
+        this.makePathObject(posX, posY);
+      }
     }
   }
 
   drawPath(ctx, x, y) {
-    let path = this.pathPositions.find(path => path.x === x && path.y === y);
-    if (!path) {
-      path = { x, y, visible: false };
-      this.pathPositions.push(path);
+    const path = this.pathPositions.find(path => path.x === x && path.y === y);
+    if (path.visible || path.know) {
+      ctx.fillStyle = path.visible ? this.stageColor1 : this.stageColor2;
+      ctx.fillRect(
+        settings.pixel * x,
+        settings.pixel * y,
+        settings.pixel,
+        settings.pixel
+      );
     }
-
-    ctx.fillStyle = path.visible ? this.stageColor1 : this.stageColor2;
-    ctx.fillRect(
-      settings.pixel * x,
-      settings.pixel * y,
-      settings.pixel,
-      settings.pixel
-    );
   }
 
   hitWall(x, y, direction = ["u"]) {
@@ -422,22 +452,55 @@ export default class Stage {
       ) {
         if (shouldUpdateVisible) {
           r.visible = true;
+          r.know = true;
+          for (const path of this.pathPositions) {
+            if (
+              path.x >= r.roomLeft - 1 && path.x <= r.roomRight + 1 &&
+              path.y >= r.roomTop - 1 && path.y <= r.roomBottom + 1
+            ) {
+              path.visible = true;
+              path.know = true;
+            }
+          }
         }
-        return true;
+        return r;
       }
     }
-    return false;
+    return null;
   }
 
-  isInnerPath(x, y, direction, shouldUpdateVisible = false) {
+  isInnerPath(x, y, directions, shouldUpdateVisible = false) {
+    const direction = directions.length > 0 ? directions[0] : null;
     for (const path of this.pathPositions) {
       if (path.x === x && path.y === y) {
         if (shouldUpdateVisible) {
           path.visible = true;
+          path.know = true;
+          if (direction === "u") {
+            for (let v = 1; v <= settings.visibleRange; v++) {
+              this.isInnerPath(x, y - v, [], shouldUpdateVisible);
+            }
+          }
+          if (direction === "d") {
+            for (let v = 1; v <= settings.visibleRange; v++) {
+              this.isInnerPath(x, y + v, [], shouldUpdateVisible);
+            }
+          }
+          if (direction === "l") {
+            for (let v = 1; v <= settings.visibleRange; v++) {
+              this.isInnerPath(x - v, y, [], shouldUpdateVisible);
+            }
+          }
+          if (direction === "r") {
+            for (let v = 1; v <= settings.visibleRange; v++) {
+              this.isInnerPath(x + v, y, [], shouldUpdateVisible);
+            }
+          }
         }
-        return true;
+
+        return path;
       }
     }
-    return false;
+    return null;
   }
 }
