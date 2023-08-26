@@ -480,20 +480,28 @@ export default class Stage {
             for (let v = 1; v <= settings.visibleRange; v++) {
               this.isInnerPath(x, y - v, [], shouldUpdateVisible);
             }
+            this.isInnerPath(x + 1, y, [], shouldUpdateVisible);
+            this.isInnerPath(x - 1, y, [], shouldUpdateVisible);
           }
           if (direction === "d") {
             for (let v = 1; v <= settings.visibleRange; v++) {
               this.isInnerPath(x, y + v, [], shouldUpdateVisible);
+              this.isInnerPath(x + 1, y, [], shouldUpdateVisible);
+              this.isInnerPath(x - 1, y, [], shouldUpdateVisible);
             }
           }
           if (direction === "l") {
             for (let v = 1; v <= settings.visibleRange; v++) {
               this.isInnerPath(x - v, y, [], shouldUpdateVisible);
+              this.isInnerPath(x, y + 1, [], shouldUpdateVisible);
+              this.isInnerPath(x, y - 1, [], shouldUpdateVisible);
             }
           }
           if (direction === "r") {
             for (let v = 1; v <= settings.visibleRange; v++) {
               this.isInnerPath(x + v, y, [], shouldUpdateVisible);
+              this.isInnerPath(x, y + 1, [], shouldUpdateVisible);
+              this.isInnerPath(x, y - 1, [], shouldUpdateVisible);
             }
           }
         }
