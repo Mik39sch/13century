@@ -6,7 +6,7 @@ import settings from "./settings";
 import { randomInt } from "./util";
 
 export default class game {
-  constructor() {
+  constructor(w, h) {
     this.loadCount = 0;
     this.gamemode = settings.gamemode.playing.val;
     this.keyboard = []
@@ -31,7 +31,7 @@ export default class game {
 
     const appEl = document.querySelector(settings.appElementID);
 
-    this._createCanvasEl(appEl);
+    this._createCanvasEl(appEl, w, h);
     this.setKeyEvent();
 
     this.stage.isInnerRoom(playerSpawnX, playerSpawnY, true);
@@ -45,6 +45,7 @@ export default class game {
 
   addKeydownEventListener(el, event, listenerArgs = undefined) {
     const keydown = e => {
+      console.log(e);
       this.keyboard = [this._adjustKeyCode(e.code)];
     }
 
@@ -90,8 +91,8 @@ export default class game {
     return code;
   }
 
-  _createCanvasEl(appEl) {
-    const [w, h] = [settings.canvasWidth, settings.canvasHeight];
+  _createCanvasEl(appEl, width, height) {
+    const [w, h] = [width, height];
     let appElWidth = w;
     [appEl.style.width, appEl.style.height] = [`${appElWidth}px`, `${h}px`];
     this.canvasEl = document.createElement("canvas");

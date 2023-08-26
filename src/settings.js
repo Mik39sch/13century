@@ -1,7 +1,11 @@
+const pixel = 16;
+const widthSize = 80;
+const heightSize = 40;
+
 export default {
   appElementID: "#app",
-  canvasWidth: window.innerWidth,
-  canvasHeight: window.innerHeight,
+  canvasWidth: widthSize * pixel,
+  canvasHeight: heightSize * pixel,
   gamemode: {
     "title": { val: 0, text: true },
     "playing": { val: 1, text: false },
@@ -9,6 +13,6 @@ export default {
     "gameover": { val: 3, text: true },
   },
   debugMode: true,
-  pixel: 16,
+  pixel,
   visibleRange: 3,
 }
