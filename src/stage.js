@@ -471,44 +471,55 @@ export default class Stage {
 
   isInnerPath(x, y, directions, shouldUpdateVisible = false) {
     const direction = directions.length > 0 ? directions[0] : null;
+    const checkPosition = [];
+    if (direction === "u") {
+      for (let v = 1; v <= settings.visibleRange; v++) {
+        checkPosition.push({ x, y: y - v });
+      }
+    }
+    if (direction === "d") {
+      for (let v = 1; v <= settings.visibleRange; v++) {
+        checkPosition.push({ x, y: y + v });
+      }
+    }
+    if (direction === "u" || direction === "d") {
+      checkPosition.push({ x: x + 1, y });
+      checkPosition.push({ x: x - 1, y });
+    }
+
+    if (direction === "l") {
+      for (let v = 1; v <= settings.visibleRange; v++) {
+        checkPosition.push({ x: x - v, y });
+      }
+    }
+    if (direction === "r") {
+      for (let v = 1; v <= settings.visibleRange; v++) {
+        checkPosition.push({ x: x + v, y });
+      }
+    }
+    if (direction === "l" || direction === "r") {
+      checkPosition.push({ x, y: y + 1 });
+      checkPosition.push({ x, y: y - 1 });
+    }
+
+
+    let current = null;
     for (const path of this.pathPositions) {
       if (path.x === x && path.y === y) {
         if (shouldUpdateVisible) {
           path.visible = true;
           path.know = true;
-          if (direction === "u") {
-            for (let v = 1; v <= settings.visibleRange; v++) {
-              this.isInnerPath(x, y - v, [], shouldUpdateVisible);
-            }
-            this.isInnerPath(x + 1, y, [], shouldUpdateVisible);
-            this.isInnerPath(x - 1, y, [], shouldUpdateVisible);
-          }
-          if (direction === "d") {
-            for (let v = 1; v <= settings.visibleRange; v++) {
-              this.isInnerPath(x, y + v, [], shouldUpdateVisible);
-              this.isInnerPath(x + 1, y, [], shouldUpdateVisible);
-              this.isInnerPath(x - 1, y, [], shouldUpdateVisible);
-            }
-          }
-          if (direction === "l") {
-            for (let v = 1; v <= settings.visibleRange; v++) {
-              this.isInnerPath(x - v, y, [], shouldUpdateVisible);
-              this.isInnerPath(x, y + 1, [], shouldUpdateVisible);
-              this.isInnerPath(x, y - 1, [], shouldUpdateVisible);
-            }
-          }
-          if (direction === "r") {
-            for (let v = 1; v <= settings.visibleRange; v++) {
-              this.isInnerPath(x + v, y, [], shouldUpdateVisible);
-              this.isInnerPath(x, y + 1, [], shouldUpdateVisible);
-              this.isInnerPath(x, y - 1, [], shouldUpdateVisible);
-            }
-          }
         }
 
-        return path;
+        current = path;
+      }
+      if (shouldUpdateVisible) {
+        if (checkPosition.some(pos => pos.x === path.x && pos.y === path.y)) {
+          path.visible = true;
+          path.know = true;
+        }
       }
     }
-    return null;
+    return current;
   }
 }

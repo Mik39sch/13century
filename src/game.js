@@ -45,7 +45,6 @@ export default class game {
 
   addKeydownEventListener(el, event, listenerArgs = undefined) {
     const keydown = e => {
-      console.log(e);
       this.keyboard = [this._adjustKeyCode(e.code)];
     }
 
