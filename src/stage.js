@@ -4,7 +4,7 @@ import settings from "./settings";
 export default class Stage {
   constructor() {
     this.divideX = randomInt({ max: 4, min: 2 });
-    this.divideY = randomInt({ max: 4, min: 2 });
+    this.divideY = 2;
 
     this.stageColor1 = 'rgba(0, 0, 150, 1)';
     this.stageColor2 = 'rgba(0, 0, 150, 0.5)';
@@ -270,10 +270,7 @@ export default class Stage {
   }
 
   draw(g) {
-    this.drawScaleLine(g.ctx);
-
     for (const r of this.realms) {
-      this.drawDivide(g.ctx, r);
       this.drawRoom(g.ctx, r);
     }
     for (const c of this.connects) {
@@ -281,56 +278,8 @@ export default class Stage {
     }
   }
 
-  drawScaleLine(ctx) {
-    ctx.strokeStyle = 'rgba(250, 250, 250, 0.25)';
-    ctx.lineWidth = 1;
-
-    const fieldY = settings.canvasHeight;
-    const fieldX = settings.canvasWidth;
-    const blockY = Math.floor(fieldY / settings.pixel);
-    const blockX = Math.floor(fieldX / settings.pixel);
-
-    let i;
-
-    for (i = 0; i <= blockY; i += 1) {
-      ctx.beginPath();
-      ctx.moveTo(0, settings.pixel * i);
-      ctx.lineTo(fieldX, settings.pixel * i);
-      ctx.stroke();
-      ctx.closePath();
-    }
-
-    for (i = 0; i <= blockX; i += 1) {
-      ctx.beginPath();
-      ctx.moveTo(settings.pixel * i, 0);
-      ctx.lineTo(settings.pixel * i, fieldY);
-      ctx.stroke();
-      ctx.closePath();
-
-    }
-    ctx.strokeStyle = 'rgba(250, 250, 250, 1)';
-    ctx.strokeRect(fieldX, fieldY, blockX * settings.pixel, blockY * settings.pixel);
-  }
-
-  drawDivide(ctx, r) {
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(250, 250, 250, 0.1)';
-    ctx.fillStyle = 'rgba(250, 250, 250, 0.05)';
-    ctx.strokeRect(
-      r.left * settings.pixel,
-      r.top * settings.pixel,
-      r.sizeX * settings.pixel,
-      r.sizeY * settings.pixel
-    );
-    ctx.fillRect(
-      r.left * settings.pixel,
-      r.top * settings.pixel,
-      r.sizeX * settings.pixel,
-      r.sizeY * settings.pixel
-    );
-  }
-
   drawRoom(ctx, r) {
+
     ctx.lineWidth = 2;
     ctx.strokeStyle = r.visible ? this.stageColor1 : this.stageColor2;
     ctx.fillStyle = r.visible ? this.stageColor1 : this.stageColor2;

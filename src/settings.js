@@ -1,9 +1,13 @@
 const pixel = 16;
-const widthSize = 80;
-const heightSize = 40;
+const widthSize = 60;
+const heightSize = 30;
 
 export default {
   appElementID: "#app",
+  width: widthSize,
+  height: heightSize,
+  viewWidth: widthSize * 4,
+  viewHeight: heightSize * 4,
   canvasWidth: widthSize * pixel,
   canvasHeight: heightSize * pixel,
   gamemode: {

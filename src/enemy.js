@@ -7,7 +7,7 @@ export default class Enemy extends Player {
     this.color = { 0: "gray", 1: "white" }
     this.speed = 1;
     this.step = 0;
-    this.prevD = []
+    this.prevD = [];
   }
 
   update(g) {
