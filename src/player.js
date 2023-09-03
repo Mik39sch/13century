@@ -6,7 +6,8 @@ export default class Player {
 
     this.height = height;
     this.width = width;
-    this.angle = 0;
+    this.angle = "u";
+    this.prevAngle = "u";
     this.color = "blue";
 
     this.characterDesign = [
@@ -32,19 +33,30 @@ export default class Player {
   }
 
   update(g) {
-    this.updateX(g.keyboard, g.stage.maxX, g.stage.minX, g);
-    this.updateY(g.keyboard, g.stage.maxY, g.stage.minY, g);
-    this.updateAngle(g.keyboard);
+    if (g.keyboard.includes("r") || g.keyboard.includes("l")) {
+      this.updateAngle(g.keyboard);
+    }
+
+    if (g.keyboard.includes("u") || g.keyboard.includes("d")) {
+      this.updateX(g.keyboard, g.stage.maxX, g.stage.minX, g);
+      this.updateY(g.keyboard, g.stage.maxY, g.stage.minY, g);
+    }
 
     g.stage.isInnerRoom(this.x, this.y, true);
-    g.stage.isInnerPath(this.x, this.y, g.keyboard, true);
+    g.stage.isInnerPath(this.x, this.y, this.angle, true);
   }
 
   updateX(direction, max, min, g) {
     const prevX = this.x;
-    if (direction.find(key => key === "r")) {
+    if (
+      this.angle === "r" && direction.includes("u") ||
+      this.angle === "l" && direction.includes("d")
+    ) {
       this.x = this.x + 1;
-    } else if (direction.find(key => key === "l")) {
+    } else if (
+      this.angle === "r" && direction.includes("d") ||
+      this.angle === "l" && direction.includes("u")
+    ) {
       this.x = this.x - 1;
     }
 
@@ -62,10 +74,16 @@ export default class Player {
 
   updateY(direction, max, min, g) {
     const prevY = this.y;
-    if (direction.find(key => key === "u")) {
+
+    if (
+      this.angle === "u" && direction.includes("u") ||
+      this.angle === "d" && direction.includes("d")
+    ) {
       this.y = this.y - 1;
-    }
-    if (direction.find(key => key === "d")) {
+    } else if (
+      this.angle === "u" && direction.includes("d") ||
+      this.angle === "d" && direction.includes("u")
+    ) {
       this.y = this.y + 1;
     }
 
@@ -81,53 +99,28 @@ export default class Player {
     }
   }
   updateAngle(direction) {
-    if (
-      !direction.includes("r") && !direction.includes("l") &&
-      direction.includes("u") && !direction.includes("d")
-    ) {
-      this.angle = 0;
+    this.prevAngle = this.angle;
+    if (direction.includes("r")) {
+      if (this.angle === "u") {
+        this.angle = "r";
+      } else if (this.angle === "r") {
+        this.angle = "d";
+      } else if (this.angle === "d") {
+        this.angle = "l";
+      } else if (this.angle === "l") {
+        this.angle = "u";
+      }
     }
-    if (
-      direction.includes("r") && !direction.includes("l") &&
-      direction.includes("u") && !direction.includes("d")
-    ) {
-      this.angle = 45;
-    }
-    if (
-      direction.includes("r") && !direction.includes("l") &&
-      !direction.includes("u") && !direction.includes("d")
-    ) {
-      this.angle = 90;
-    }
-    if (
-      direction.includes("r") && !direction.includes("l") &&
-      !direction.includes("u") && direction.includes("d")
-    ) {
-      this.angle = 135;
-    }
-    if (
-      !direction.includes("r") && !direction.includes("l") &&
-      !direction.includes("u") && direction.includes("d")
-    ) {
-      this.angle = 180;
-    }
-    if (
-      !direction.includes("r") && direction.includes("l") &&
-      !direction.includes("u") && direction.includes("d")
-    ) {
-      this.angle = 225;
-    }
-    if (
-      !direction.includes("r") && direction.includes("l") &&
-      !direction.includes("u") && !direction.includes("d")
-    ) {
-      this.angle = 270;
-    }
-    if (
-      !direction.includes("r") && direction.includes("l") &&
-      direction.includes("u") && !direction.includes("d")
-    ) {
-      this.angle = 315;
+    if (direction.includes("l")) {
+      if (this.angle === "u") {
+        this.angle = "l";
+      } else if (this.angle === "r") {
+        this.angle = "u";
+      } else if (this.angle === "d") {
+        this.angle = "r";
+      } else if (this.angle === "l") {
+        this.angle = "d";
+      }
     }
   }
 

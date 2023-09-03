@@ -16,6 +16,8 @@ export default class game {
     this.displayCtx = undefined;
     this.stage = new Stage();
 
+    this.prevTime = performance.now();
+
     const spawnPos = () => {
       const r = this.stage.realms[randomInt({ max: this.stage.realms.length - 1, min: 0 })];
       return [randomInt({ max: r.roomRight, min: r.roomLeft }), randomInt({ max: r.roomBottom, min: r.roomTop })];
@@ -43,13 +45,14 @@ export default class game {
   }
 
   setKeyEvent() {
-    this.addKeydownEventListener(document, "keydown");
-    // this.addKeyupEventListener(document, "keyup");
+    // this.addKeydownEventListener(document, "keydown");
+    this.addKeyupEventListener(document, "keyup");
   }
 
   addKeydownEventListener(el, event, listenerArgs = undefined) {
     const keydown = e => {
       this.keyboard = [this._adjustKeyCode(e.code)];
+      this._draw();
     }
 
     if (listenerArgs) {
@@ -61,7 +64,8 @@ export default class game {
 
   addKeyupEventListener(el, event, listenerArgs = undefined) {
     const keyup = e => {
-      this.keyboard = [];
+      this.keyboard = [this._adjustKeyCode(e.code)];
+      this._draw();
     }
 
     if (listenerArgs) {
@@ -73,7 +77,8 @@ export default class game {
 
 
   run() {
-    this.engine.runRenderLoop(this._draw.bind(this));
+    // this.engine.runRenderLoop(this._draw.bind(this));
+    this._draw();
   }
 
   /** private functions -----------------------------------------------------------------------------------------------*/
@@ -119,24 +124,18 @@ export default class game {
   }
 
   _draw() {
-    this.scene.render();
-    // if (Math.round(callback / 10) * 10 % 500 == 0) {
-    //   this.update();
+    this.update();
     this.drawMap();
-    // }
-
-    // const currentGameMode = Object.values(settings.gamemode).find(mode => mode.val === this.gamemode);
-    // if (!currentGameMode.text) {
-    //   this.timer = requestAnimationFrame(this._draw.bind(this));
-    // }
+    this.scene.render();
   }
 
   update() {
     this.stage.update(this);
     this.player.update(this);
-    for (const enemy of this.enemies) {
-      enemy.update(this);
-    }
+    // for (const enemy of this.enemies) {
+    //   enemy.update(this);
+    // }
+    this.threeDrawer.update(this);
   }
 
   drawMap() {
@@ -148,7 +147,7 @@ export default class game {
     // for (const enemy of this.enemies) {
     //   enemy.draw(this);
     // }
-    // this.player.draw(this);
+    this.player.draw(this);
 
     this.ctx.restore();
     this.displayCtx.drawImage(this.canvasEl, 0, 0);
