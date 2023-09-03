@@ -1,6 +1,7 @@
 import Enemy from "./enemy";
 import Player from "./player";
 import Stage from "./stage";
+import threeDrawer from "./3ddrawer";
 
 import settings from "./settings";
 import { randomInt } from "./util";
@@ -36,6 +37,9 @@ export default class game {
 
     this.stage.isInnerRoom(playerSpawnX, playerSpawnY, true);
     this.stage.isInnerPath(playerSpawnX, playerSpawnY, ["u"], true);
+
+    this.threeDrawer = new threeDrawer(this);
+    this.threeDrawer.drawMap(this, this.stage);
   }
 
   setKeyEvent() {
@@ -69,7 +73,7 @@ export default class game {
 
 
   run() {
-    this._draw();
+    this.engine.runRenderLoop(this._draw.bind(this));
   }
 
   /** private functions -----------------------------------------------------------------------------------------------*/
@@ -99,37 +103,54 @@ export default class game {
 
     this.ctx = this.canvasEl.getContext('2d');
     const canvasEl = document.createElement("canvas");
-    [canvasEl.style.width, canvasEl.style.height] = [`${w}px`, `${h}px`];
+    [canvasEl.style.width, canvasEl.style.height] = [`${settings.viewWidth}px`, `${settings.viewHeight}px`];
     [canvasEl.width, canvasEl.height] = [w, h];
 
     this.displayCtx = canvasEl.getContext('2d');
     appEl.appendChild(canvasEl);
+
+    this.canvas3DEl = document.createElement("canvas");
+    [this.canvas3DEl.style.width, this.canvas3DEl.style.height] = [w, h];
+    appEl.appendChild(this.canvas3DEl);
+
+    this.engine = new BABYLON.Engine(this.canvas3DEl);
+    this.scene = new BABYLON.Scene(this.engine);
+    this.scene.clearColor = new BABYLON.Color3(0.8, 0.8, 0.8);
   }
 
-  _draw(callback) {
-    if (Math.round(callback / 10) * 10 % 500 == 0) {
-      this.ctx.save();
+  _draw() {
+    this.scene.render();
+    // if (Math.round(callback / 10) * 10 % 500 == 0) {
+    //   this.update();
+    this.drawMap();
+    // }
 
-      this.ctx.fillStyle = '#205030';
-      this.ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
+    // const currentGameMode = Object.values(settings.gamemode).find(mode => mode.val === this.gamemode);
+    // if (!currentGameMode.text) {
+    //   this.timer = requestAnimationFrame(this._draw.bind(this));
+    // }
+  }
 
-      this.stage.update(this);
-      this.player.update(this);
-      this.stage.draw(this);
-
-      for (const enemy of this.enemies) {
-        enemy.update(this);
-        enemy.draw(this);
-      }
-      this.player.draw(this);
-
-      this.ctx.restore();
-      this.displayCtx.drawImage(this.canvasEl, 0, 0);
+  update() {
+    this.stage.update(this);
+    this.player.update(this);
+    for (const enemy of this.enemies) {
+      enemy.update(this);
     }
+  }
 
-    const currentGameMode = Object.values(settings.gamemode).find(mode => mode.val === this.gamemode);
-    if (!currentGameMode.text) {
-      this.timer = requestAnimationFrame(this._draw.bind(this));
-    }
+  drawMap() {
+    this.ctx.save();
+    this.ctx.fillStyle = '#205030';
+    this.ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
+
+    this.stage.draw(this);
+    // for (const enemy of this.enemies) {
+    //   enemy.draw(this);
+    // }
+    // this.player.draw(this);
+
+    this.ctx.restore();
+    this.displayCtx.drawImage(this.canvasEl, 0, 0);
   }
 }
