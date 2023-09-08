@@ -4,6 +4,7 @@ const heightSize = 30;
 
 export default {
   appElementID: "#app",
+  wrapperElementID: "#wrapper",
   width: widthSize,
   height: heightSize,
   viewWidth: widthSize * 4,

@@ -1,6 +1,5 @@
 html,
-body,
-canvas#app {
+body {
   margin: 0;
   padding: 0;
   width: 100%;
@@ -20,6 +19,16 @@ canvas {
   height: 100%;
 }
 
+#wrapper {
+  position: absolute;
+}
+
 #app {
   margin: 0 auto;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
 }

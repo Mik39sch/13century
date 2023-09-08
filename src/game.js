@@ -33,8 +33,9 @@ export default class game {
     ];
 
     const appEl = document.querySelector(settings.appElementID);
+    const wrapperEl = document.querySelector(settings.wrapperElementID);
 
-    this._createCanvasEl(appEl, w, h);
+    this._createCanvasEl(appEl, wrapperEl, w, h);
     this.setKeyEvent();
 
     this.stage.isInnerRoom(playerSpawnX, playerSpawnY, true);
@@ -99,7 +100,7 @@ export default class game {
     return code;
   }
 
-  _createCanvasEl(appEl, width, height) {
+  _createCanvasEl(appEl, wrapperEl, width, height) {
     const [w, h] = [width, height];
     let appElWidth = w;
     [appEl.style.width, appEl.style.height] = [`${appElWidth}px`, `${h}px`];
@@ -110,13 +111,15 @@ export default class game {
     const canvasEl = document.createElement("canvas");
     [canvasEl.style.width, canvasEl.style.height] = [`${settings.viewWidth}px`, `${settings.viewHeight}px`];
     [canvasEl.width, canvasEl.height] = [w, h];
+    canvasEl.style.zIndex = 1;
 
     this.displayCtx = canvasEl.getContext('2d');
-    appEl.appendChild(canvasEl);
+    wrapperEl.appendChild(canvasEl);
 
     this.canvas3DEl = document.createElement("canvas");
     [this.canvas3DEl.style.width, this.canvas3DEl.style.height] = [w, h];
-    appEl.appendChild(this.canvas3DEl);
+    this.canvas3DEl.style.zIndex = 0;
+    wrapperEl.appendChild(this.canvas3DEl);
 
     this.engine = new BABYLON.Engine(this.canvas3DEl);
     this.scene = new BABYLON.Scene(this.engine);
