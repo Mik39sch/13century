@@ -9,6 +9,8 @@ export default class Stage {
     this.stageColor1 = 'rgba(0, 0, 150, 1)';
     this.stageColor2 = 'rgba(0, 0, 150, 0.5)';
 
+    this.defaultVisible = true;
+
     this.realms = [];
     this.connects = [];
     this.pathPositions = [];
@@ -102,7 +104,7 @@ export default class Stage {
       r.roomSizeY = height;
       r.roomRight = left + width - 1;
       r.roomBottom = top + height - 1;
-      r.visible = false;
+      r.visible = this.defaultVisible;
       r.know = false;
       return r;
     }
@@ -163,7 +165,7 @@ export default class Stage {
   makePathObject(x, y) {
     let path = this.pathPositions.find(path => path.x === x && path.y === y);
     if (!path) {
-      path = { x, y, visible: false, know: false };
+      path = { x, y, visible: this.defaultVisible, know: false };
       this.pathPositions.push(path);
     }
   }
@@ -262,7 +264,7 @@ export default class Stage {
 
   update(g) {
     for (const r of this.realms) {
-      r.visible = false;
+      r.visible = this.defaultVisible;
     }
     for (const path of this.pathPositions) {
       path.visible = false;

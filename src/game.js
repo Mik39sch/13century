@@ -135,9 +135,9 @@ export default class game {
   update() {
     this.stage.update(this);
     this.player.update(this);
-    // for (const enemy of this.enemies) {
-    //   enemy.update(this);
-    // }
+    for (const enemy of this.enemies) {
+      enemy.update(this);
+    }
     this.threeDrawer.update(this);
   }
 
@@ -147,9 +147,9 @@ export default class game {
     this.ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
 
     this.stage.draw(this);
-    // for (const enemy of this.enemies) {
-    //   enemy.draw(this);
-    // }
+    for (const enemy of this.enemies) {
+      enemy.draw(this);
+    }
     this.player.draw(this);
 
     this.ctx.restore();
