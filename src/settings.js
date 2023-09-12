@@ -7,8 +7,8 @@ export default {
   wrapperElementID: "#wrapper",
   width: widthSize,
   height: heightSize,
-  viewWidth: widthSize * 4,
-  viewHeight: heightSize * 4,
+  viewWidth: widthSize * 6,
+  viewHeight: heightSize * 6,
   canvasWidth: widthSize * pixel,
   canvasHeight: heightSize * pixel,
   gamemode: {

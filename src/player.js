@@ -8,28 +8,7 @@ export default class Player {
     this.width = width;
     this.angle = "u";
     this.prevAngle = "u";
-    this.color = "blue";
-
-    this.characterDesign = [
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
-      [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
-      [1, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 1],
-      [1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ];
-    this.color = { 0: "white", 1: "black" }
-
+    this.color = "yellow";
   }
 
   update(g) {
@@ -129,34 +108,34 @@ export default class Player {
   }
 
   drawCharacter(ctx) {
-    let design = this.characterDesign.slice();
-    const rotate = a => a[0].map((_, c) => a.map(r => r[c])).reverse();
-    if (this.angle > 45 && this.angle <= 135) {
-      design = rotate(rotate(rotate(design)));
-    } else if (this.angle > 135 && this.angle <= 225) {
-      design = rotate(rotate(design));
-    } else if (this.angle > 225 && this.angle <= 270) {
-      design = rotate(design);
+    const startPoint = this.x * settings.pixel + this.width / 2;
+    const endPoint = this.y * settings.pixel + this.width / 2;
+    const size = this.width / 2;
+
+    let angle = 0;
+    if (this.angle === "r") {
+      angle = 90;
+    }
+    if (this.angle === "d") {
+      angle = 180;
+    }
+    if (this.angle === "l") {
+      angle = 270;
     }
 
-    const startX = this.x * settings.pixel;
-    const startY = this.y * settings.pixel;
+    const s1 = startPoint - size * Math.cos((90 + angle) / 180 * Math.PI);
+    const e1 = endPoint - size * Math.sin((90 + angle) / 180 * Math.PI);
+    const s2 = startPoint - size * Math.cos((210 + angle) / 180 * Math.PI);
+    const e2 = endPoint - size * Math.sin((210 + angle) / 180 * Math.PI);
+    const s3 = startPoint - size * Math.cos((330 + angle) / 180 * Math.PI);
+    const e3 = endPoint - size * Math.sin((330 + angle) / 180 * Math.PI);
 
-    let y = 0;
-    let x = 0;
-    for (const row of design) {
-      x = 0;
-      for (const colorIdx of row) {
-        ctx.fillStyle = this.color[colorIdx];
-        ctx.fillRect(
-          startX + x,
-          startY + y,
-          1,
-          1
-        );
-        x++;
-      }
-      y++;
-    }
+    ctx.beginPath();
+    ctx.moveTo(s1, e1);
+    ctx.lineTo(s2, e2);
+    ctx.lineTo(s3, e3);
+    ctx.closePath();
+    ctx.fillStyle = this.color;
+    ctx.fill();
   }
 }

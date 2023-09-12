@@ -1,4 +1,4 @@
-import Enemy from "./enemy";
+import NPC from "./npc";
 import Player from "./player";
 import Stage from "./stage";
 import threeDrawer from "./3ddrawer";
@@ -7,16 +7,29 @@ import settings from "./settings";
 import { randomInt } from "./util";
 
 export default class game {
-  constructor(w, h) {
+  constructor() {
     this.loadCount = 0;
-    this.gamemode = settings.gamemode.playing.val;
+    this.gamemode = settings.gamemode.title;
     this.keyboard = []
     this.canvasEl = undefined;
     this.ctx = undefined;
     this.displayCtx = undefined;
-    this.stage = new Stage();
+    this.stage = undefined;
+    this.initialized = false;
 
     this.prevTime = performance.now();
+
+    const appEl = document.querySelector(settings.appElementID);
+    const wrapperEl = document.querySelector(settings.wrapperElementID);
+
+    this._createCanvasEl(appEl, wrapperEl, settings.canvasWidth, settings.canvasHeight);
+    this.setKeyEvent();
+
+    this.initializeGame();
+  }
+
+  initializeGame() {
+    this.stage = new Stage();
 
     const spawnPos = () => {
       const r = this.stage.realms[randomInt({ max: this.stage.realms.length - 1, min: 0 })];
@@ -27,44 +40,61 @@ export default class game {
 
     this.player = new Player({ x: playerSpawnX, y: playerSpawnY, height: settings.pixel, width: settings.pixel });
 
-    const [enemySpawnX, enemySpawnY] = spawnPos();
-    this.enemies = [
-      new Enemy({ x: enemySpawnX, y: enemySpawnY, height: settings.pixel, width: settings.pixel }),
-    ];
+    const enemyCount = randomInt({ max: 5, min: 1 });
+    let enemySpawnX, enemySpawnY;
+    this.enemies = [];
+    for (let i = 0; i < enemyCount; i++) {
+      [enemySpawnX, enemySpawnY] = spawnPos();
+      this.enemies.push(new NPC({ x: enemySpawnX, y: enemySpawnY, height: settings.pixel, width: settings.pixel }));
+    }
 
-    const appEl = document.querySelector(settings.appElementID);
-    const wrapperEl = document.querySelector(settings.wrapperElementID);
-
-    this._createCanvasEl(appEl, wrapperEl, w, h);
-    this.setKeyEvent();
+    const [broSpawnX, broSpawnY] = spawnPos();
+    this.brother = new NPC({ x: broSpawnX, y: broSpawnY, height: settings.pixel, width: settings.pixel });
 
     this.stage.isInnerRoom(playerSpawnX, playerSpawnY, true);
     this.stage.isInnerPath(playerSpawnX, playerSpawnY, ["u"], true);
+    const wrapperEl = document.querySelector(settings.wrapperElementID);
+    if (this.canvas3DEl) {
+      wrapperEl.removeChild(this.canvas3DEl);
+    }
+
+    this.canvas3DEl = document.createElement("canvas");
+    [this.canvas3DEl.style.width, this.canvas3DEl.style.height] = [settings.canvasWidth, settings.canvasHeight];
+    this.canvas3DEl.style.zIndex = 0;
+    wrapperEl.appendChild(this.canvas3DEl);
+
+    this.engine = new BABYLON.Engine(this.canvas3DEl);
+    this.scene = new BABYLON.Scene(this.engine);
+    this.scene.clearColor = new BABYLON.Color3(0.659, 0.863, 0.925);
 
     this.threeDrawer = new threeDrawer(this);
     this.threeDrawer.drawMap(this, this.stage);
+
+    this.initialized = true;
+
+    this._draw();
   }
 
   setKeyEvent() {
-    // this.addKeydownEventListener(document, "keydown");
     this.addKeyupEventListener(document, "keyup");
-  }
-
-  addKeydownEventListener(el, event, listenerArgs = undefined) {
-    const keydown = e => {
-      this.keyboard = [this._adjustKeyCode(e.code)];
-      this._draw();
-    }
-
-    if (listenerArgs) {
-      el.addEventListener(event, () => keydown(listenerArgs));
-    } else {
-      el.addEventListener(event, keydown);
-    }
   }
 
   addKeyupEventListener(el, event, listenerArgs = undefined) {
     const keyup = e => {
+      const wrapperEl = document.querySelector(settings.wrapperElementID);
+      if (this.textEl) {
+        wrapperEl.removeChild(this.textEl);
+        this.textEl = undefined;
+      }
+
+      if (this.gamemode.text) {
+        this.gamemode = settings.gamemode.playing;
+        if (!this.initialized) {
+          this.initializeGame();
+        }
+        return;
+      }
+
       this.keyboard = [this._adjustKeyCode(e.code)];
       this._draw();
     }
@@ -117,16 +147,52 @@ export default class game {
     wrapperEl.appendChild(canvasEl);
 
     this.canvas3DEl = document.createElement("canvas");
+    this.canvas3DEl.id = "3dcanvas";
     [this.canvas3DEl.style.width, this.canvas3DEl.style.height] = [w, h];
     this.canvas3DEl.style.zIndex = 0;
     wrapperEl.appendChild(this.canvas3DEl);
-
-    this.engine = new BABYLON.Engine(this.canvas3DEl);
-    this.scene = new BABYLON.Scene(this.engine);
-    this.scene.clearColor = new BABYLON.Color3(0.8, 0.8, 0.8);
   }
 
   _draw() {
+    let text = "";
+    if (this.gamemode.val === settings.gamemode.title.val) {
+      text = [
+        { text: "Run away from pied piper of Hamelin", size: 16 },
+        { text: "", size: 10 },
+        { text: "Rule: ", size: 10 },
+        { text: "  You should find Green(brother).", size: 10 },
+        { text: "  If you are found by pied piper of hamelin(Red)...", size: 10 },
+        { text: "Control: ", size: 10 },
+        { text: "  Right/Left key: Change Direction", size: 10 },
+        { text: "  Up Key: forward, Down Key: Back", size: 10 },
+        { text: "", size: 10 },
+        { text: "Press any key, You can start the game.", size: 10 },
+      ];
+    }
+    if (this.gamemode.val === settings.gamemode.gameclear.val) {
+      text = [
+        { text: "Congratulations!!!", size: 24 },
+        { text: "", size: 10 },
+        { text: "You could help your brother and run away!!", size: 10 },
+        { text: "", size: 10 },
+        { text: "Press any key, You can restart the game.", size: 10 },
+      ];
+    }
+    if (this.gamemode.val === settings.gamemode.gameover.val) {
+      text = [
+        { text: "Game over!!!", size: 24 },
+        { text: "", size: 10 },
+        { text: "You could not run away!!", size: 10 },
+        { text: "", size: 10 },
+        { text: "Press any key, You can restart the game.", size: 10 },
+      ];
+    }
+
+    if (this.gamemode.text) {
+      this.drawText(text);
+      console.log(text);
+      return;
+    }
     this.update();
     this.drawMap();
     this.scene.render();
@@ -138,7 +204,41 @@ export default class game {
     for (const enemy of this.enemies) {
       enemy.update(this);
     }
+    this.brother.update(this);
     this.threeDrawer.update(this);
+
+    if (this.enemies.some(enemy => (
+      enemy.x === this.player.x &&
+      enemy.y === this.player.y
+    ))) {
+      this.gamemode = settings.gamemode.gameover;
+      this.initialized = false;
+      this._draw();
+    }
+
+    if (this.brother.x === this.player.x && this.brother.y === this.player.y) {
+      this.gamemode = settings.gamemode.gameclear;
+      this.initialized = false;
+      this._draw();
+    }
+  }
+
+  drawText(text) {
+    if (this.textEl) return;
+    const wrapperEl = document.querySelector(settings.wrapperElementID);
+
+    this.textEl = document.createElement("canvas");
+    [this.textEl.style.width, this.textEl.style.height] = [settings.canvasWidth, settings.canvasHeight];
+    this.textEl.style.zIndex = 9;
+    wrapperEl.appendChild(this.textEl);
+    const ctx = this.textEl.getContext('2d');
+    let currentY = 30;
+    for (const t of text) {
+      ctx.font = `${t.size}px serif`;
+      ctx.fillStyle = 'rgba(200, 200, 200)';
+      ctx.fillText(t.text, 10, currentY);
+      currentY += t.size + 1;
+    }
   }
 
   drawMap() {
@@ -147,6 +247,7 @@ export default class game {
     this.ctx.fillRect(0, 0, settings.canvasWidth, settings.canvasHeight);
 
     this.stage.draw(this);
+    this.brother.draw(this);
     for (const enemy of this.enemies) {
       enemy.draw(this);
     }

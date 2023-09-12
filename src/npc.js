@@ -1,10 +1,10 @@
 import { randomInt } from "./util";
 import Player from "./player";
 
-export default class Enemy extends Player {
+export default class NPC extends Player {
   constructor({ x, y, height, width }) {
     super({ x, y, height, width });
-    this.color = { 0: "gray", 1: "white" }
+    this.color = "red";
     this.speed = 1;
     this.step = 0;
     this.prevD = [];

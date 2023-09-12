@@ -6,9 +6,9 @@ const elements = [];
 const main = () => {
   let g;
   if (navigator.userAgent.match(/iPhone|Android.+Mobile/)) {
-    g = new smtGame(settings.canvasWidth, settings.canvasHeight);
+    g = new smtGame();
   } else {
-    g = new game(settings.canvasWidth, settings.canvasHeight);
+    g = new game();
   }
   g.run();
 }

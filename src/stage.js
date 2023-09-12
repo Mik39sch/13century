@@ -9,7 +9,7 @@ export default class Stage {
     this.stageColor1 = 'rgba(0, 0, 150, 1)';
     this.stageColor2 = 'rgba(0, 0, 150, 0.5)';
 
-    this.defaultVisible = true;
+    this.defaultVisible = false;
 
     this.realms = [];
     this.connects = [];
@@ -272,12 +272,44 @@ export default class Stage {
   }
 
   draw(g) {
+    this.drawScaleLine(g);
     for (const r of this.realms) {
       this.drawRoom(g.ctx, r);
     }
     for (const c of this.connects) {
       this.drawConnect(g.ctx, c);
     }
+  }
+
+  drawScaleLine(g) {
+    g.ctx.strokeStyle = 'rgba(250, 250, 250, 0.25)';
+    g.ctx.lineWidth = 1;
+
+    const fieldY = settings.canvasHeight;
+    const fieldX = settings.canvasWidth;
+    const blockY = Math.floor(fieldY / settings.pixel);
+    const blockX = Math.floor(fieldX / settings.pixel);
+
+    let i;
+
+    for (i = 0; i <= blockY; i += 1) {
+      g.ctx.beginPath();
+      g.ctx.moveTo(0, settings.pixel * i);
+      g.ctx.lineTo(fieldX, settings.pixel * i);
+      g.ctx.stroke();
+      g.ctx.closePath();
+    }
+
+    for (i = 0; i <= blockX; i += 1) {
+      g.ctx.beginPath();
+      g.ctx.moveTo(settings.pixel * i, 0);
+      g.ctx.lineTo(settings.pixel * i, fieldY);
+      g.ctx.stroke();
+      g.ctx.closePath();
+
+    }
+    g.ctx.strokeStyle = 'rgba(250, 250, 250, 1)';
+    g.ctx.strokeRect(fieldX, fieldY, blockX * settings.pixel, blockY * settings.pixel);
   }
 
   drawRoom(ctx, r) {
