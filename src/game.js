@@ -190,7 +190,6 @@ export default class game {
 
     if (this.gamemode.text) {
       this.drawText(text);
-      console.log(text);
       return;
     }
     this.update();
