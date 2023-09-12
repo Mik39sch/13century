@@ -57,7 +57,7 @@ export default class threeDrawer {
     bhead.material = m_ehead;
 
     const m_bbody = new BABYLON.StandardMaterial("m_bbody", g.scene);
-    m_bbody.emissiveColor = new BABYLON.Color3(0, 100, 0);
+    m_bbody.emissiveColor = new BABYLON.Color3(1, 0.3, 0.3);
     const bbody = BABYLON.Mesh.CreateCylinder("bbody", 2, 0, 1, 24, 1, g.scene);
     bbody.position.y = 0;
     bbody.material = m_bbody;

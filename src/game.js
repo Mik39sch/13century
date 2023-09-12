@@ -40,7 +40,7 @@ export default class game {
 
     this.player = new Player({ x: playerSpawnX, y: playerSpawnY, height: settings.pixel, width: settings.pixel });
 
-    const enemyCount = randomInt({ max: 5, min: 1 });
+    const enemyCount = randomInt({ max: 10, min: 3 });
     let enemySpawnX, enemySpawnY;
     this.enemies = [];
     for (let i = 0; i < enemyCount; i++) {
@@ -160,7 +160,7 @@ export default class game {
         { text: "Run away from pied piper of Hamelin", size: 16 },
         { text: "", size: 10 },
         { text: "Rule: ", size: 10 },
-        { text: "  You should find Green(brother).", size: 10 },
+        { text: "  You should find brother(Pink).", size: 10 },
         { text: "  If you are found by pied piper of hamelin(Red)...", size: 10 },
         { text: "Control: ", size: 10 },
         { text: "  Right/Left key: Change Direction", size: 10 },

@@ -3,8 +3,8 @@ import settings from "./settings";
 
 export default class Stage {
   constructor() {
-    this.divideX = randomInt({ max: 4, min: 2 });
-    this.divideY = 2;
+    this.divideX = randomInt({ max: 5, min: 2 });
+    this.divideY = 3;
 
     this.stageColor1 = 'rgba(0, 0, 150, 1)';
     this.stageColor2 = 'rgba(0, 0, 150, 0.5)';
